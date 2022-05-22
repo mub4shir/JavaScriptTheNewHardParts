@@ -1,0 +1,143 @@
+#JavaScriptTheNewHardParts =>
+
+# as soon as we start running our code, we create a global execution context
+	-- thread of execution (parsing and executing the code line after line)
+	-- live memory of variables with data (known as a global variable environment)
+
+# when you execute a function you create a new execution context comprising:
+	1: the thread of execution (we go through the code in the functon line by line)
+	2: a local memory (variable environment) where anything defined in the fucntion is stored
+
+
+# we keep track of the function being called in javascript with a call stack 
+
+# tracks which execution context we are in that is it, what function is currently being run and where to return to after an execution context is popped off the stack 
+
+# one global execution context, a new function execution context for every time we run a function
+
+# asynchronicity is the backbone of modern web development in javascript 
+
+# javascript is single threaded (one command executing at a time ) and has a synchronous execution model (each line is executed in the order the code appears)
+
+# so what if we need to wait some time before we can execute certain bits of code? perhaps we need to wait on fresh data from an api/server request or for a timer to complete and then execute our code 
+
+# we have a conundrum - a tension between wanting to delay some code execution but not wanting to block the thread from any further code running while we wait 
+
+### goals / 3 way conundrum
+
+1. be able to do task that take a long time to complete e.g getting data from server 
+
+2. continue runnig our javascript code line by line without one long task blocking further javascript executing 
+
+3. when our slow task completes, we should be able to run functionality knowing 
+that task is done and data is ready!
+
+### conundrum 
+
+# problem 
+	 -- fundamentally untenable - blocks our single javascript thread from running any further code while the task completes 
+
+# benefits 
+	-- it's easy to reason about 
+
+
+# introducing web browser apis/ node background threads 
+
+	function printHello(){
+		console.log("Hello");
+	}
+	setTimeout(printHello, 1000);
+
+	console.log("Me First!");
+
+  ### facade function => setTimeout() 
+	=> just spins up background work 
+	=> not pure javascript, timer feature, a pretend func
+
+# we're interacting with a world outside of javascript now - so we need rules 
+
+	function printHello(){
+		console.log("Hello");
+	}
+
+	function blockFor1Sec(){
+		// blocks in the javascript thread for 1 second 
+		// e.g looping 
+	}
+
+	setTimeout(printHello, 0);
+
+	blockFor1Sec();
+
+	console.log("Me first!");
+
+	# printHello() func is allowed back in javascript only when our call stack is empty and all our global code is finished before that it is wating in callback queue read to run 
+
+	# and eventLoop is the processess for checking if the stack is empty (this is is global code finished running ) and which functions are ready in the callback queue ready to run 
+
+	### probelms 
+		--no problems!
+		--our response data is only available in the callback function - callback hell 
+		-- maybe it feels a little odd to think of a passing a function into another function only for it to run much later 
+
+	### benifits 
+		--super explicit once you understand how it works under-the-hood 
+
+		
+	## losing control of our execution 
+
+
+	### 
+		so if you're an aspring engineer and you're not working on tough problems everyday, then you fall into the trap of what i call easy learning. 
+		easy learning is learning where you don't hit blocks and therefore you don't grow, so how do u do what i call hard learning that's effective 
+		that actually is what makes you grow as an engineer. well, you do things like tough coding challenges. You build projects, You have assignments 
+		But the problem with those is it's super tempting to do what? To do anything else besides that. Including, so we might be making a cup of tea.
+		whatever, but even if it's not that, even if the other person's like, no no I can actually push through them. You may still fall into two traps.
+		i call it the researcher versus the stack overflower.
+		Ideally as a software engineer, we're always balancing these two extremes.
+		i wanna understand everything and how it's working, but i simultaneously gotta make it work sometimes, just make it work without understanding every piece. we're always balancing these two needs.
+		as a pro enginner facing tough challenges, we've hopefully learned to balance that effectively. But we could awlays get better at it, and the best way i know to get the balance right is pair programming.
+		pair progamming, by separating the concerns. (navigator and driver)
+		and exchange the role perodically
+	###
+	## plug and play script person 
+
+	# introducing the readability enhancer - Promises
+
+		--special object built into javascript that gets returned immediately 
+		when we make a call to web browser api/feature 
+		(e.g.  fetch ) that's set up to return promises (not all are)
+
+		--promises act as a placeholder for the data we hope get back 
+		from the web browser feature's background work 
+
+		--we also attach the functionality we want to defer running until 
+		that background work is done (using the built in .then method)
+
+		--promises objects will automatically trigger that functionality to run 
+
+			--the value returned from the web browser feature's work 
+			(e.g. the returned data from the server using fetch ) will be that function's input/argument
+			
+
+	# but we need to know how our promise-deferred functionality gets back into javascript to be run 
+
+		function display(data){ console.log(data); }
+		function printHello(){ console.log('Hello'); }
+		function blockFor300ms(){ /* blocks js thread for 300ms with long for loop */}
+
+		setTimeout(printHello, 0);
+
+		const futureData = fectch('https://twitter.com/will/tweets/1');
+		futureData.then(display);
+		blockFor300ms();
+
+		// which runs first?
+
+		console.log("Me first!");
+
+		### we need a way of queuing up all this deferred functionality 
+		
+
+
+
