@@ -265,6 +265,90 @@ that task is done and data is ready!
 
 
 
+### javascript's built in iterator are actually objects with a next method that
+when called returns the next element from the  'stream'/ flow - so let's restructure slightly
+
+    function createFlow(){
+        let i =0;
+        const inner={next: function(){
+            const element = array[i];
+            i++;
+            return element;
+            }
+        }
+        return inner;
+   }
+
+    const returnNextElement=createFlow([4,5,6]);
+    const element1 = returnNextElement.next();
+    const element2 = returnNextElement.next();
+
+    and the built in iterators actually produce the next element in the format:
+    {value: 4}
+
+
+    	### once we start thinking of our data as flows (where we can pick of an element one-by-one)
+    	we can rethink how we produce those flows javascript now lets us produce the flows
+    	using a function
+
+    function *createFlow(){ // generator function
+      yield 4;
+      yield 5;
+      yield 6
+    }
+    const returnNextElement = createFlow()
+    console.log(returnNextElement.next())
+    console.log(returnNextElement.next())
+
+    what do we hope returnNextElement.next() will return? but how?
+
+   ### line 299 createFlow does not go inside createFlow's execution context instead
+    it returns a special generator object with a function next on it when called it
+    gonna do something fascinating. now returnNextElement has next method on it
+    because it was the output of running createFlow
+    we have now finished call to create flow
+
+    ### line 300 is going to open the execution context of createFow
+    it's gonna start initiate calling createFlow, the function from which
+    it was born
+    yield is a super powerful keyword just like return that exits out of
+    function, but it's suspending the execution context, it's not ending it
+
+    ### this allows us to dynamically set what data flows to us (when we run returnNextElement's function )
+
+    function *createFlow(){
+        const num=10;
+        const newNum = yield num; // not a thing u can store in newNum
+        yield 5 + newNum;
+        yield 6
+    }
+    const returnNextElement = createFlow();
+    console.log(returnNextElement.next());
+    console.log(returnNextElement.next(2));
+
+    ###  this io gonna allow us to pass data back into our execution context
+    almost like an argument back into it so yield 10 its job before was to return 10
+    and then we come back in to the function, it didn't get a chance because
+    this yield was so powerful it threw the ten out into the last call to
+    next and stored it in element one and when we come back that expression
+    evaluates through it becomes to javascript inside of here, whatever we pass in as the input
+    line 327 and that is the very nature of the design of these generator functions
+    when you go back into them you get to insert data back into their local executtion
+    context as the evaluated result of the previous yield expression, the previous
+    yield statement
+    not a thing u can store in newNum but we pass back into number two which replaces
+    that piece, is a thing we just throw a newNum =2;
+    ### its, a paradigm shift in how we think about designing our code
+
+
+
+   ### returnNextElement is a special object (a generator object ) that when its next
+   method is run starts (or continues ) running createFlow until it hits yield and return out the
+   value being yielded
+
+
+   we end up with 'stream'/flow of values that we can get one-by-one
+   by running returnNextElement.next()
 
 
 
