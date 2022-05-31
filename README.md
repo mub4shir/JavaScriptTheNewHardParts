@@ -378,7 +378,7 @@ when called returns the next element from the  'stream'/ flow - so let's restruc
 
     futureData.then(doWhenDataReceived);
 
-   ####async/ await simplifies all this and finally fixes the inversion of control
+   #### async/ await simplifies all this and finally fixes the inversion of control
     problem of callbacks
 
 
