@@ -1,47 +1,49 @@
 # JavaScriptTheNewHardParts =>
 
 # as soon as we start running our code, we create a global execution context
+
 	-- thread of execution (parsing and executing the code line after line)
 	-- live memory of variables with data (known as a global variable environment)
 
 # when you execute a function you create a new execution context comprising:
+
 	1: the thread of execution (we go through the code in the functon line by line)
 	2: a local memory (variable environment) where anything defined in the fucntion is stored
 
+# we keep track of the function being called in javascript with a call stack
 
-# we keep track of the function being called in javascript with a call stack 
-
-# tracks which execution context we are in that is it, what function is currently being run and where to return to after an execution context is popped off the stack 
+# tracks which execution context we are in that is it, what function is currently being run and where to return to after an execution context is popped off the stack
 
 # one global execution context, a new function execution context for every time we run a function
 
-# asynchronicity is the backbone of modern web development in javascript 
+# asynchronicity is the backbone of modern web development in javascript
 
 # javascript is single threaded (one command executing at a time ) and has a synchronous execution model (each line is executed in the order the code appears)
 
-# so what if we need to wait some time before we can execute certain bits of code? perhaps we need to wait on fresh data from an api/server request or for a timer to complete and then execute our code 
+# so what if we need to wait some time before we can execute certain bits of code? perhaps we need to wait on fresh data from an api/server request or for a timer to complete and then execute our code
 
-# we have a conundrum - a tension between wanting to delay some code execution but not wanting to block the thread from any further code running while we wait 
+# we have a conundrum - a tension between wanting to delay some code execution but not wanting to block the thread from any further code running while we wait
 
 ### goals / 3 way conundrum
 
-1. be able to do task that take a long time to complete e.g getting data from server 
+1. be able to do task that take a long time to complete e.g getting data from server
 
-2. continue runnig our javascript code line by line without one long task blocking further javascript executing 
+2. continue runnig our javascript code line by line without one long task blocking further javascript executing
 
-3. when our slow task completes, we should be able to run functionality knowing 
-that task is done and data is ready!
+3. when our slow task completes, we should be able to run functionality knowing
+   that task is done and data is ready!
 
-### conundrum 
+### conundrum
 
-# problem 
+# problem
+
 	 -- fundamentally untenable - blocks our single javascript thread from running any further code while the task completes 
 
-# benefits 
+# benefits
+
 	-- it's easy to reason about 
 
-
-# introducing web browser apis/ node background threads 
+# introducing web browser apis/ node background threads
 
 	function printHello(){
 		console.log("Hello");
@@ -50,11 +52,12 @@ that task is done and data is ready!
 
 	console.log("Me First!");
 
-  ### facade function => setTimeout() 
+### facade function => setTimeout()
+
 	=> just spins up background work 
 	=> not pure javascript, timer feature, a pretend func
 
-# we're interacting with a world outside of javascript now - so we need rules 
+# we're interacting with a world outside of javascript now - so we need rules
 
 	function printHello(){
 		console.log("Hello");
@@ -137,22 +140,20 @@ that task is done and data is ready!
 		console.log("Me first!");
 
 		### we need a way of queuing up all this deferred functionality 
-		
+
 ### problems
+
 	-- 99% fo developers have no idea how they're working under the hood 
 	-- debugging becomes super-hard 
 
-### benifits 
+### benifits
+
 	-- cleaner readable style with pseudo-synchronous style code 
 	-- nice error handling process
-
-
-
 
 ### promises, web apis, the callback & microtask queues and event loop allow us 	to defer our action until the 'work' (an api request, timer etc) is completed	 and continue running our code line by line in the meantime
 
 ### asynchronous javascript is the backbone of the modern web - letting us built fast 'non-blocking'
-
 
 ### itreators
 
@@ -263,9 +264,8 @@ that task is done and data is ready!
     we have truly 'decoupled' the process of accessing each element from what we want to
     do to each element
 
-
-
 ### javascript's built in iterator are actually objects with a next method that
+
 when called returns the next element from the  'stream'/ flow - so let's restructure slightly
 
     function createFlow(){
@@ -277,7 +277,8 @@ when called returns the next element from the  'stream'/ flow - so let's restruc
             }
         }
         return inner;
-   }
+
+}
 
     const returnNextElement=createFlow([4,5,6]);
     const element1 = returnNextElement.next();
@@ -302,7 +303,8 @@ when called returns the next element from the  'stream'/ flow - so let's restruc
 
     what do we hope returnNextElement.next() will return? but how?
 
-   ### line 299 createFlow does not go inside createFlow's execution context instead
+### line 299 createFlow does not go inside createFlow's execution context instead
+
     it returns a special generator object with a function next on it when called it
     gonna do something fascinating. now returnNextElement has next method on it
     because it was the output of running createFlow
@@ -340,19 +342,18 @@ when called returns the next element from the  'stream'/ flow - so let's restruc
     that piece, is a thing we just throw a newNum =2;
     ### its, a paradigm shift in how we think about designing our code
 
+### returnNextElement is a special object (a generator object ) that when its next
 
+method is run starts (or continues ) running createFlow until it hits yield and return out the
+value being yielded
 
-   ### returnNextElement is a special object (a generator object ) that when its next
-   method is run starts (or continues ) running createFlow until it hits yield and return out the
-   value being yielded
+we end up with 'stream'/flow of values that we can get one-by-one
+by running returnNextElement.next()
 
+### and most importantly, for the first time we get a pause('suspend')
 
-   we end up with 'stream'/flow of values that we can get one-by-one
-   by running returnNextElement.next()
-
-   ### and most importantly, for the first time we get a pause('suspend')
-   a function being run and then return to it by calling
-   returnNextElement.next()
+a function being run and then return to it by calling
+returnNextElement.next()
 
     # in  asynchronous javascript we want to
         1. initiate a task that takes a long time (e.g. requesting data from the server)
@@ -378,7 +379,8 @@ when called returns the next element from the  'stream'/ flow - so let's restruc
 
     futureData.then(doWhenDataReceived);
 
-   #### async/ await simplifies all this and finally fixes the inversion of control
+#### async/ await simplifies all this and finally fixes the inversion of control
+
     problem of callbacks
 
 
