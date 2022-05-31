@@ -1,4 +1,4 @@
-#JavaScriptTheNewHardParts =>
+# JavaScriptTheNewHardParts =>
 
 # as soon as we start running our code, we create a global execution context
 	-- thread of execution (parsing and executing the code line after line)
