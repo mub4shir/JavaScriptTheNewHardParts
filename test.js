@@ -100,6 +100,7 @@ const returnNextElement = createFlow();
 console.log(returnNextElement.next());
 console.log(returnNextElement.next(2));
 console.log(returnNextElement.next());
+
 // console.log(returnNextElement.next());
 // console.log(returnNextElement.next());
 // console.log(returnNextElement.next());

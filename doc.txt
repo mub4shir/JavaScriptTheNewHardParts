@@ -350,6 +350,52 @@ when called returns the next element from the  'stream'/ flow - so let's restruc
    we end up with 'stream'/flow of values that we can get one-by-one
    by running returnNextElement.next()
 
+   ### and most importantly, for the first time we get a pause('suspend')
+   a function being run and then return to it by calling
+   returnNextElement.next()
+
+    # in  asynchronous javascript we want to
+        1. initiate a task that takes a long time (e.g. requesting data from the server)
+        2. move to more synchronous regular code in the meantime
+        3. run some functionality once the requested data has come back
+
+        what if we were to yield out of the function at the moment of sending
+        off the long-time task and return to the function only when the is complete
+
+    ### we can use the ability to pause createFlow's running and then restart
+    it only when our data returns
+
+    function doWhenDataReceived(value){
+        returnNextElement.next(value)
+    }
+
+    function* createFlow(){
+    const data = yield fetch ('http://twitter.com/will/tweets/1');
+    console.log(data);
+    }
+    const returnNextElement = createFlow()
+    const futureData = returnNextElement.next()
+
+    futureData.then(doWhenDataReceived);
+
+   ####async/ await simplifies all this and finally fixes the inversion of control
+    problem of callbacks
+
+
+    async function createFlow(){
+        console.log("Me First");
+        const data = await fetch('http://twitter.com/will/tweets/1');
+        console.log(data);
+    }
+    createFlow();
+    console.log("Me second");
+
+    #### no need for a triggered function on the promise resolution, instead we auto
+    trigger the resumption of the createFlow execution (this functionality is still added to the microtask queue though)
+
+
+
+
 
 
 
