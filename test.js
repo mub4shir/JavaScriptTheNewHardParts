@@ -89,11 +89,11 @@
 // console.log(returnNextElement.next());
 // console.log(returnNextElement.next());
 
-function *createFlow(){
-  const num=10;
-  const newNum = yield num;
-  yield 5 + newNum;
-  yield 6
+function* createFlow() {
+    const num = 10;
+    const newNum = yield num;
+    yield 5 + newNum;
+    yield 6
 }
 
 const returnNextElement = createFlow();
